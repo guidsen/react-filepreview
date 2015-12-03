@@ -26,7 +26,7 @@ module.exports = {
       loader: 'style!css!autoprefixer-loader!less'
     }, {
       test: [/\.svg/, /\.eot/, /\.ttf/, /\.woff/],
-      loader: "file-loader?prefix=assets/fonts/"
+      loader: 'file-loader?prefix=assets/fonts/'
     }]
   }
 };
