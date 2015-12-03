@@ -1,0 +1,28 @@
+.attachment {
+  overflow: hidden;
+  .fa-close {
+    position: absolute;
+    right: 40px;
+    font-size: 15px;
+    color: #B5B5B5;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  .upload-content {
+    float: left;
+    width: 100%;
+    margin: 0 20px;
+
+    .progress {
+      margin: 15px 20px 0 0;
+    }
+  }
+
+  img {
+    float: left;
+    height: 60px;
+    width: 15%;
+    border-radius: 2px;
+  }
+}
