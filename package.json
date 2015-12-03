@@ -1,10 +1,15 @@
 {
+  "author": "Guido Schmitz <hello@guidoschmitz.co> (http://github.com/guidsen)",
   "name": "react-filepreview",
   "version": "0.1.0",
   "description": "Filepreview component for showing files and progress",
+  "license": "MIT",
+  "homepage": "https://github.com/guidsen/react-filepreview",
+  "main": "dist/index.js",
   "scripts": {
     "start": "node server.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "build": "webpack --config=webpack.config.prod.js"
   },
   "repository": {
     "type": "git",
@@ -21,12 +26,9 @@
     "filepreview",
     "preview"
   ],
-  "author": "Guido Schmitz <hello@guidoschmitz.co> (http://github.com/guidsen)",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/guidsen/react-filepreview/issues"
   },
-  "homepage": "https://github.com/guidsen/react-filepreview",
   "devDependencies": {
     "autoprefixer-loader": "3.1.0",
     "babel-core": "^6.0.20",
