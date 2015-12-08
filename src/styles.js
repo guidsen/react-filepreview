@@ -1,19 +1,23 @@
 const containerHeight = '50px';
 const alertBox = {
-  padding: '18px 15px 12px 15px',
-  marginBottom: '10px',
-  height: '20px',
-  borderRadius: '4px',
+  padding: '10px 15px',
+  margin: '10px 0px',
+  lineHeight: '20px',
+  minHeight: '20px',
+  borderRadius: '3px',
+  fontSize: '15px',
+  border: '1px solid transparent',
 }
 
 export default {
   errorBox: Object.assign(alertBox, {
     backgroundColor: '#f2dede',
     color: '#a94442',
-    borderColor: 'ebccd1',
+    borderColor: '#ebccd1',
   }),
   previewContainer: {
     fontFamily: 'Helvetica',
+    margin: '10px 0px',
     fontSize: '12px',
   },
   previewItem: {

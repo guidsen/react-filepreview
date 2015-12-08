@@ -24,8 +24,7 @@ export default class FilePreview extends Component {
     super(props);
 
     this.state = {
-      loading: true,
-      previews: [],
+      files: [],
     };
   }
 
@@ -40,37 +39,20 @@ export default class FilePreview extends Component {
     files: PropTypes.object.isRequired,
   }
 
-  /**
-   * Handler when component will receive props.
-   * @param {object} nextProps
-   * @method componentWillReceiveProps
-   */
   componentWillReceiveProps(nextProps) {
-    if (nextProps.files.length === 0) {
-      this.clearFiles();
-    }
-
-    this.getPreviews(nextProps);
+    this.setState({ files: this.fileListToArray(nextProps.files) });
   }
 
   /**
-   * Removes the clicked preview from the state.
-   * @method onHandleRemove
+   * Removes the clicked file from the state.
+   * @method handleRemove
    * @param {number} removeIndex The index of the preview
    * @event
    */
-  handleRemove(previewToRemove) {
-    const newPreviews = this.state.previews.filter(preview => {
-      return preview.file.timestamp !== previewToRemove.file.timestamp;
-    });
-
-    this.setState({
-      previews: newPreviews,
-    });
-
-    if (this.props.onRemove) {
-      this.props.onRemove(previewToRemove);
-    }
+  handleRemove(fileToRemove) {
+    this.setState({ files: this.state.files.filter(file => {
+      return file.name !== fileToRemove.name;
+    })});
   }
 
   /**
@@ -79,17 +61,15 @@ export default class FilePreview extends Component {
    * @return {object} Markup of the component
    */
   render() {
-    const items = this.state.previews.map((preview, index) => {
-      const progressStyles = { ...styles.progress, display: this.state.previews.length > 0 ? 'block' : 'none' };
-      const uploadText = preview.file.progress === 100 ? 'Upload finished' : 'Uploading file..';
+    const { files } = this.state;
 
-      const previewItemStyles = Object.assign(styles, { progressStyles });
+    const validationMessages = this.createValidationMessages(files);
+    if (validationMessages.length > 0) {
+      return <div style={styles.errorBox}>{ validationMessages.shift() }</div>
+    }
 
-      if (!preview.valid) {
-        return <div key={index} style={styles.errorBox}>{ preview.errorMessage }</div>;
-      }
-
-      return <PreviewItem key={index} preview={preview} onRemove={this.handleRemove.bind(this)} styles={previewItemStyles} />;
+    const items = files.map((file, index) => {
+      return <PreviewItem key={index} file={file} onRemove={this.handleRemove.bind(this)} styles={styles} />;
     });
 
     return (
@@ -99,63 +79,40 @@ export default class FilePreview extends Component {
     );
   }
 
-  /**
-   * Get the previews of the files.
-   * @method getPreviews
-   * @param {array} files Array of File objects
-   */
-  getPreviews({ maxSize, maxFiles, files }) {
-    if (this.state.previews.length < maxFiles) {
-      for (let i = 0; i < files.length; i++) {
-        const file = files.item(i);
-        file.timestamp = new Date();
-        file.progress = 0;
-        file.base64 = null;
+  fileListToArray(fileList) {
+    const arr = [];
 
-        const previews = [ ...this.state.previews, { file, completed: false, valid: true } ];
-        this.setState({ previews });
-
-        const isTooLarge = file.size > maxSize * 1048576;
-        const isWrongType = file.type !== 'image/png' && file.type !== 'image/jpg';
-
-        if (isTooLarge || isWrongType) {
-          const newPreviews = previews.map(preview => {
-            if (preview.file.timestamp === file.timestamp) {
-              preview.valid = false;
-
-              if (isWrongType) {
-                preview.errorMessage = `Het bestand mag alleen .png of .jpg zijn.`;
-              }
-
-              if (isTooLarge) {
-                preview.errorMessage = `Het bestand mag maximaal ${maxSize}MB bevatten.`;
-              }
-            }
-
-            return preview;
-          });
-
-          return this.setState({ previews: newPreviews });
-        }
-
-        const fileReader = new FileReader();
-
-        fileReader.readAsDataURL(file);
-
-        fileReader.onloadend = () => {
-          const newPreviews = this.state.previews.map(preview => {
-            if (preview.file.timestamp === file.timestamp) {
-              preview.base64 = fileReader.result;
-              preview.completed = true;
-            }
-
-            return preview;
-          });
-
-          this.setState({ loading: false, previews: newPreviews });
-        }
-      };
+    for (let i = 0; i < fileList.length; i++) {
+        arr.push(fileList.item(i));
     }
+
+    return arr;
+  }
+
+  createValidationMessages(files) {
+    const { maxSize } = this.props;
+    const validationMessages = [];
+
+    files.forEach(file => {
+      if (!this.isValidType(file)) {
+        validationMessages.push('Het bestand mag alleen .png of .jpg zijn.');
+      }
+
+      if (!this.hasValidSize(file, maxSize)) {
+        validationMessages.push(`Het bestand mag maximaal ${maxSize}MB bevatten.`);
+      }
+    });
+
+    return validationMessages;
+  }
+
+  hasValidSize(file, maxSizeInMb) {
+    return file.size < maxSizeInMb * 1048576;
+  }
+
+  isValidType(file) {
+    console.log('type', file.type);
+    return file.type == 'image/png' || file.type == 'image/jpg';
   }
 
   /**
